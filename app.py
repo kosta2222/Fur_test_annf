@@ -7,34 +7,21 @@ from operations import operations
 n1=2
 m1=1
 
-m2=1
-n2=3
-
-X_and_or_xor=[[0,1],[1,0],[1,1],[0,0]]
-Y_and=[[0],[0],[1],[0]]
-Y_or=[[1],[1],[1],[0]]
+X_and_or_xor=[[0,1],[1,0],[0,0],[1,1]]
+Y_and=[[0],[0],[0],[1]]
+Y_or=[[1],[1],[0],[1]]
 Y_xor=[[1],[1],[0],[0]]
 
 X_and_or_xor_pr=[[0,1],[1,0],[0,0]]
-Y_and_pr=[[0],[0],[0]]
+Y_and_pr=[[0],  [0],  [0]]
+Y_or_pr=[[1],  [1],  [0]]
+Y_xor_pr=[[1],[1],[0]]
 
 X_comp=[[2/4, 2/4]]
 Y_comp=[[1/4]]
 
 
 nn_params=NN_params()
-
-#def cr_matr(m, n):
-    #matr=np.zeros((m, n))  
-    #for row in range(m):
-        #i=1 #  коэффициент частоты
-        #k=0  #  время
-        #for elem in range(n):
-            #arg=2 * np.pi * i * k   
-            #matr[row][elem]=math.cos(arg) 
-            #i+=1
-            #k+=1
-    #return matr
     
 def cr_matr(m, n):
     """
@@ -50,9 +37,6 @@ def cr_matr(m, n):
         i+=1
      return matr   
     
-
-#def cr_matr_const(m, n):
-    #return np.zeros((m, n)) + 0.5674321
     
 def convert_to_fur(data:list)->list:
     """
@@ -80,8 +64,7 @@ def convert_to_fur(data:list)->list:
  
     
 matr1=cr_matr(m1, n1)
- 
-#matr2=cr_matr(m2, n2)    
+  
     
 
 def my_dot(matr:list,data:list)->list:
@@ -105,18 +88,6 @@ def my_dot(matr:list,data:list)->list:
         
     return dst_acted, dst
 
-#def my_dot(matr:list,data:list)->list:
-    #dst=[None] * len(matr)
-    #dst_acted=[None] * len(matr)
-    #for row in range(len(matr)):
-        #tmp_v=0
-        #for elem in range(len(matr[0])): 
-          #tmp_v+=matr[row][elem] * data[elem]
-        #dst[row]=tmp_v  
-        #dst_acted[row]=operations(TAN,tmp_v,0,0,0,"",nn_params)
-       
-        
-    #return dst_acted, dst
 
 def get_mse(out_nn,teacher,n):
     """
@@ -150,7 +121,8 @@ def evaluate(X_test, Y_test):
     for row in range(rows):
         x_test = X_test[row]
         y_test = Y_test[row]
-        #x_test=convert_to_fur(x_test)
+        x_test=convert_to_fur(x_test)
+        y_test=convert_to_fur(y_test)
         #print(f'x: {x_test} y: {y_test}')
         out_nn,_=my_dot(matr1, x_test)
         #out_nn, _=my_dot(matr1, out, m2, n2)       
@@ -192,7 +164,7 @@ def feed_learn(X, Y, eps, l_r_,with_adap_lr,ac_,mse_):
     ac_: уверенность сети для выхода
     mse_: пороговый минимальная среднеквадратичная ошибка выхода
     """
-    global matr1, matr2
+    global matr1
     alpha=0.99
     beta=1.01
     gama=1.01
@@ -216,16 +188,14 @@ def feed_learn(X, Y, eps, l_r_,with_adap_lr,ac_,mse_):
         y=Y[retrive_ind]
         y=convert_to_fur(y)
         out_nn,weighted=my_dot(matr1, x)
-        #out_nn,dst=my_dot(matr1, out, m2, n2)
         mse=get_mse(out_nn,y,m1)
         print("mse",mse)
         print("out nn",out_nn)     
         delta=(np.array(out_nn) - np.array(y)) * operations(TAN_DERIV, weighted[0],0,0,0,"",nn_params)
         delta_np=np.array(delta)
         print("delta",delta_np)
-        #delta_np=np.sin(delta_np) 
         if with_adap_lr:
-            error=get_mse(out_nn,y,m2)
+            error=get_mse(out_nn,y,m1)
             delta_error=error - gama * error_pr
             if delta_error>0:
                 l_r=alpha * l_r
@@ -237,19 +207,10 @@ def feed_learn(X, Y, eps, l_r_,with_adap_lr,ac_,mse_):
         if ac==float(ac_) and mse<=mse_:
            exit_flag=True
            break             
-        #print("type matr",type(matr)) 
-        #koef2=matr2 * delta_np
-        #matr2-=koef2 * l_r
         
         koef1=np.dot(delta_np, matr1) 
-        print("koef1",koef1)
         matr1-=koef1 * l_r * x
-        for row in range(m1):
-            for elem in range(n1):
-                #matr1[row]-=koef1 * l_r * elem
-                pass
-        print("lr",l_r)
-      
+        print("lr",l_r)  
       if exit_flag:
           break 
       if it==eps:
@@ -278,5 +239,5 @@ def predict(matr,data,func):
     return dst_acted     
     
 # (X, Y, eps, l_r_,with_adap_lr,ac_,mse_)    
-feed_learn(X_and_or_xor,Y_and, 1000, 0.01,False,100,0.01) 
-print(f'predict: {predict(matr1,[0.1, 0.001], TAN)}')
+feed_learn(X_and_or_xor,Y_xor, 1000, 0.01,True,100,0.01) 
+print(f'predict: {predict(matr1,[1, 1], TAN)}')
