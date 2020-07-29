@@ -7,7 +7,7 @@ from util import convert_to_fur
 from cross_val_eval import evaluate
 from util import get_logger
 from fit import fit
-from learn import cr_lay, answer_nn_direct
+from learn import cr_lay, answer_nn_direct, train, get_hidden
 
 n1=2
 m1=1
@@ -108,7 +108,7 @@ def get_mse(out_nn,teacher,n):
         sum_+=math.pow((out_nn[row]-teacher[row]),2)
     return sum_ / n   
         
-def evaluate_new(X_test, Y_test):
+def evaluate_new(X_test, Y_test, loger):
     """
     Оценка набора в процентах
     X_test: матрица обучающего набора X
@@ -129,12 +129,12 @@ def evaluate_new(X_test, Y_test):
         x_test=convert_to_fur(x_test)
         y_test=convert_to_fur(y_test)
         #print(f'x: {x_test} y: {y_test}')
-        out_nn,_=my_dot(matr1, x_test)
+        #out_nn,_=my_dot(matr1, x_test)
         #out_nn, _=my_dot(matr1, out, m2, n2)       
         for elem in range(wi_y_test):
-            elem_of_out_nn = out_nn[elem]
+            elem_of_out_nn = answer_nn_direct(nn_params, x_test, loger)
             elem_answer = y_test[elem]
-            if elem_of_out_nn > 0.5:
+            if elem_of_out_nn[0] > 0.5:
                 elem_of_out_nn = 1
                 print("output vector elem -> ( %f ) " % 1, end=' ')
                 print("expected vector elem -> ( %f )" % elem_answer, end=' ');
@@ -158,7 +158,7 @@ def evaluate_new(X_test, Y_test):
   
     return res_acc
 
-def feed_learn(X, Y, eps, l_r_,with_adap_lr,ac_,mse_):
+def feed_learn(X, Y, eps, l_r_,with_adap_lr,ac_,mse_,loger):
     """
     Обучение сети на 1-но слойном перпецетроне
     X: обучающий набор
@@ -192,13 +192,15 @@ def feed_learn(X, Y, eps, l_r_,with_adap_lr,ac_,mse_):
         x=np.array(x)
         y=Y[retrive_ind]
         y=convert_to_fur(y)
-        out_nn,weighted=my_dot(matr1, x)
-        mse=get_mse(out_nn,y,m1)
+        #out_nn,weighted=my_dot(matr1, x)
+        train(nn_params, x, y, loger)
+        out_nn=get_hidden(nn_params.net[nn_params.nl_count - 1])
+        mse=get_mse(out_nn,y,nn_params.outpu_neurons)
         print("mse",mse)
         print("out nn",out_nn)     
-        delta=(np.array(out_nn) - np.array(y)) * operations(TAN_DERIV, weighted[0],0,0,0,"",nn_params)
-        delta_np=np.array(delta)
-        print("delta",delta_np)
+        #delta=(np.array(out_nn) - np.array(y)) * operations(TAN_DERIV, weighted[0],0,0,0,"",nn_params)
+        #delta_np=np.array(delta)
+        #print("delta",delta_np)
         if with_adap_lr:
             error=get_mse(out_nn,y,m1)
             delta_error=error - gama * error_pr
@@ -207,14 +209,15 @@ def feed_learn(X, Y, eps, l_r_,with_adap_lr,ac_,mse_):
             else:
                 l_r=beta * l_r
             error_pr=error
-        ac=evaluate(X,Y)
+            nn_params.lr=l_r
+        ac=evaluate_new(X,Y, loger)
         print("acc", ac)            
         if ac==float(ac_) and mse<=mse_:
            exit_flag=True
            break             
         
-        koef1=np.dot(delta_np, matr1) 
-        matr1-=koef1 * l_r * x
+        #koef1=np.dot(delta_np, matr1) 
+        #matr1-=koef1 * l_r * x
         print("lr",l_r)  
       if exit_flag:
           break 
@@ -247,11 +250,12 @@ def predict(matr,data,func):
 #feed_learn(X_and_or_xor,Y_and, 1000, 0.01,True,100,0.01) 
 #print(f'predict: {predict(matr1,[0.6, 0.7], TAN)}')
 nn_params=Nn_params()
-loger, date=get_logger("release", 'log.txt', __name__)
+loger, date=get_logger("debug", 'log.txt', __name__)
 i=cr_lay(nn_params, 'F', 2, 1, TAN, loger)
-nn_params.with_adap_lr=True
+nn_params.with_adap_lr=False
 nn_params.with_loss_threshold=True
 nn_params.input_neurons=2
 nn_params.outpu_neurons=1
-fit(nn_params, 1000, X_and_or_xor, Y_and, X_comp_and_or_xor, Y_and, loger)
-print(answer_nn_direct(nn_params, [0.6, 0.7], loger))
+#fit(nn_params, 1000, X_and_or_xor, Y_and, X_comp_and_or_xor, Y_and, loger)
+feed_learn(X_and_or_xor, Y_and, 1000, 0.01, True, 100, 0.01, loger) 
+print(answer_nn_direct(nn_params, [1, 1], loger))

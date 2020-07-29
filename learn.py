@@ -69,13 +69,7 @@ def upd_matrix(nn_params:Nn_params, objLay:Lay, entered_vals):
     assert ("here_use_dZ0rowdWrow","here_use_dZ0rowdWrow")
     for row in range(objLay.out):
         for elem in range(objLay.in_):
-            if nn_params.with_bias:
-                if elem==0:
-                   objLay.matrix[row][elem]-= nn_params.lr * objLay.errors[elem] * 1
-                else:
-                    objLay.matrix[row][elem]-= nn_params.lr * objLay.errors[elem] * entered_vals[row]
-            else:
-                objLay.matrix[row][elem] -= nn_params.lr * objLay.errors[elem] * entered_vals[row]
+            objLay.matrix[row][elem] -= nn_params.lr * objLay.errors[elem] * entered_vals[row]
 
 def feed_forwarding(nn_params:Nn_params,ok:bool, loger):
     if nn_params.nl_count==1:
@@ -120,17 +114,16 @@ def make_hidden(nn_params, objLay:Lay, inputs:list, loger:logging.Logger):
     loger.debug(f'lay {objLay.des}')
     loger.debug(f'use func: {objLay.act_func}')
     if objLay.des=='F':
-        val = 0
         for row in range(objLay.out):
             tmp_v=0
             n=1
             for elem in range(objLay.in_):
-                    tmp_v+=math.cos(2 * math.pi * objLay.matrix[row][elem]) * inputs[elem]
+                tmp_v+=math.cos(2 * math.pi * n * objLay.matrix[row][elem]) * inputs[elem]
+                n+=1
             objLay.cost_signals[row] = tmp_v
             if objLay.act_func!=SOFTMAX:
                val = operations(objLay.act_func,tmp_v, 0, 0, 0, "", nn_params)
                objLay.hidden[row] = val
-            tmp_v = 0
         if objLay.act_func==SOFTMAX:
             ret_vec=softmax_ret_vec(objLay.cost_signals,objLay.out)
             copy_vector(ret_vec, objLay.hidden, objLay.out )
@@ -164,8 +157,10 @@ def make_hidden_on_contrary(nn_params:Nn_params, objLay:Lay, inputs:list, loger:
                    ret_vec = softmax_ret_vec(objLay.cost_signals, objLay.out)
                    copy_vector(ret_vec, objLay.hidden, objLay.out)
 def backpropagate(nn_params:Nn_params, loger):
+    loger.debug('-in backpropagate-')
     calc_out_error(nn_params, nn_params.net[nn_params.nl_count - 1],nn_params.targets, loger)
     if nn_params.nl_count == 1:
+        loger.debug('op')
         calc_hid_zero_lay(nn_params.net[0], nn_params.out_errors)
     else:    
       for i in range(nn_params.nl_count - 1, 0, -1):
@@ -204,9 +199,7 @@ def initiate_layers(nn_params:Nn_params,network_map:tuple,size):
         set_io(nn_params, nn_params.net[i], in_, out)
 
 def cr_lay(nn_params:Nn_params, type_='F', in_=0, out=0, act_func=None, loger=None):
-    loger.debug('-in cr_lay-')
-    
-    
+    loger.debug('-in cr_lay-') 
     #i=-1
     if type_=='F':
         nn_params.sp_d+=1
