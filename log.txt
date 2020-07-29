@@ -1,0 +1,103 @@
+INFO:__main__:-in fit-
+INFO:__main__:[Dense:
+des = F
+in_ = 2
+out = 1
+matrix = <size of <class 'list'> [or list[0] ] is greater 50>
+cost_signals = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+act_func = 9
+hidden = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+errors = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+inner_m = <size of <class 'list'> [or list[0] ] is greater 50>
+, Dense:
+des = F
+in_ = None
+out = None
+matrix = <size of <class 'list'> [or list[0] ] is greater 50>
+cost_signals = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+act_func = 1
+hidden = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+errors = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+inner_m = <size of <class 'list'> [or list[0] ] is greater 50>
+, Dense:
+des = F
+in_ = None
+out = None
+matrix = <size of <class 'list'> [or list[0] ] is greater 50>
+cost_signals = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+act_func = 1
+hidden = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+errors = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+inner_m = <size of <class 'list'> [or list[0] ] is greater 50>
+, Dense:
+des = F
+in_ = None
+out = None
+matrix = <size of <class 'list'> [or list[0] ] is greater 50>
+cost_signals = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+act_func = 1
+hidden = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+errors = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+inner_m = <size of <class 'list'> [or list[0] ] is greater 50>
+, Dense:
+des = F
+in_ = None
+out = None
+matrix = <size of <class 'list'> [or list[0] ] is greater 50>
+cost_signals = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+act_func = 1
+hidden = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+errors = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+inner_m = <size of <class 'list'> [or list[0] ] is greater 50>
+, Dense:
+des = F
+in_ = None
+out = None
+matrix = <size of <class 'list'> [or list[0] ] is greater 50>
+cost_signals = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+act_func = 1
+hidden = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+errors = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+inner_m = <size of <class 'list'> [or list[0] ] is greater 50>
+, Dense:
+des = F
+in_ = None
+out = None
+matrix = <size of <class 'list'> [or list[0] ] is greater 50>
+cost_signals = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+act_func = 1
+hidden = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+errors = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+inner_m = <size of <class 'list'> [or list[0] ] is greater 50>
+]
+INFO:__main__:=iteration= 1
+INFO:__main__:mse 1.0
+INFO:__main__:accuracy 0.0
+INFO:__main__:mse 0.304
+INFO:__main__:accuracy 0.0
+INFO:__main__:mse 0.0
+INFO:__main__:accuracy 0.0
+INFO:__main__:mse 0.093
+INFO:__main__:accuracy 0.0
+INFO:__main__:learning rate 0.0099
+INFO:__main__:=iteration= 2
+INFO:__main__:mse 0.976
+INFO:__main__:accuracy 0.0
+INFO:__main__:mse 0.281
+INFO:__main__:accuracy 0.0
+INFO:__main__:mse 0.0
+INFO:__main__:accuracy 0.0
+INFO:__main__:mse 0.068
+INFO:__main__:accuracy 0.0
+INFO:__main__:learning rate 0.009801
+INFO:__main__:=iteration= 3
+INFO:__main__:mse 0.767
+INFO:__main__:accuracy 0.0
+INFO:__main__:mse 0.173
+INFO:__main__:accuracy 0.0
+INFO:__main__:mse 0.0
+INFO:__main__:accuracy 0.0
+INFO:__main__:mse 0.0
+INFO:__main__:accuracy 100.0
+INFO:__main__:*CV (after batch)*
+INFO:__main__:accuracy 100.0

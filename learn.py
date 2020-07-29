@@ -1,11 +1,10 @@
 import math
-from .nn_constants import RELU, RELU_DERIV, INIT_W_HE, INIT_W_MY, SIGMOID, SIGMOID_DERIV, TAN, TAN_DERIV, INIT_W_GLOROT_MY,\
+from nn_constants import RELU, RELU_DERIV, INIT_W_HE, INIT_W_MY, SIGMOID, SIGMOID_DERIV, TAN, TAN_DERIV, INIT_W_GLOROT_MY,\
 INIT_W_HE_MY, SOFTMAX, CROS_ENTROPY, MODIF_MSE, INIT_W_MY_DEB
-from .NN_params import Nn_params   # импортруем параметры сети
-from .Lay import Lay, Dense   # импортируем слой
-from .work_with_arr import copy_vector
-from .operations import operations, softmax_ret_vec
-from .work_with_arr import copy_vector
+from NN_params import Nn_params   # импортруем параметры сети
+from Lay import Lay, Dense   # импортируем слой
+from work_with_arr import copy_vector
+from operations import operations, softmax_ret_vec
 import logging
 
 
@@ -120,18 +119,13 @@ def make_hidden(nn_params, objLay:Lay, inputs:list, loger:logging.Logger):
     loger.debug('-in make_hidden-')
     loger.debug(f'lay {objLay.des}')
     loger.debug(f'use func: {objLay.act_func}')
-    if objLay.des=='d':
+    if objLay.des=='F':
         val = 0
         for row in range(objLay.out):
             tmp_v=0
+            n=1
             for elem in range(objLay.in_):
-                if nn_params.with_bias:
-                   if elem==0:
-                      tmp_v+=objLay.matrix[row][elem]
-                   else:
-                      tmp_v+=objLay.matrix[row][elem] * inputs[elem]
-                else:
-                    tmp_v+=objLay.matrix[row][elem] * inputs[elem]
+                    tmp_v+=math.cos(2 * math.pi * objLay.matrix[row][elem]) * inputs[elem]
             objLay.cost_signals[row] = tmp_v
             if objLay.act_func!=SOFTMAX:
                val = operations(objLay.act_func,tmp_v, 0, 0, 0, "", nn_params)
@@ -179,7 +173,7 @@ def backpropagate(nn_params:Nn_params, loger):
            calc_hid_error(nn_params, nn_params.net[i-1], i, nn_params.out_errors, loger)
         else:
             calc_hid_error(nn_params, nn_params.net[i-1], i, nn_params.net[i+1].errors, loger)
-       calc_hid_zero_lay(nn_params.net[0], nn_params.net[1].errors)
+        calc_hid_zero_lay(nn_params.net[0], nn_params.net[1].errors)
     if nn_params.nl_count == 1:
         upd_matrix(nn_params, nn_params.net[0], nn_params.inputs)
     else:    
@@ -222,7 +216,7 @@ def cr_lay(nn_params:Nn_params, type_='F', in_=0, out=0, act_func=None, loger=No
         for row in range(out):
               i=1 
               for elem in range(in_):
-                 nn_params.net[sp_d].matrix[row][elem] = i
+                 nn_params.net[nn_params.sp_d].matrix[row][elem] = i
                  i+=1
         nn_params.nl_count+=1
         loger.debug(f'nn_params.sp_d {nn_params.sp_d} nn_params.net[nn_params.sp_d] {nn_params.net[nn_params.sp_d]}')

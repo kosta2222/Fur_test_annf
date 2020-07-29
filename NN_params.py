@@ -21,7 +21,7 @@ class  Nn_params:
         self.inputs=[0]*(max_rows_orOut_10 )  # входа сети
         self.targets=[0]*(max_rows_orOut_10)  # ответы от учителя
         self.out_errors = [0] * (max_rows_orOut_10)  # вектор ошибок слоя
-        self.lr=0.07;  # коэффициент обучения
+        self.lr=0.01;  # коэффициент обучения
         self.loss_func=MODIF_MSE
         self.with_adap_lr = False
         self.with_bias = False

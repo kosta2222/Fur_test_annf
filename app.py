@@ -3,6 +3,11 @@ import math
 from nn_constants import SIGMOID, SIGMOID_DERIV, TAN, TAN_DERIV, RELU, RELU_DERIV, LEAKY_RELU, LEAKY_RELU_DERIV
 from NN_params import Nn_params
 from operations import operations
+from util import convert_to_fur
+from cross_val_eval import evaluate
+from util import get_logger
+from fit import fit
+from learn import cr_lay, answer_nn_direct
 
 n1=2
 m1=1
@@ -21,7 +26,7 @@ X_comp_and_or_xor=[[2/4, 2/4]]
 Y_comp_and=[[1/4]]
 
 
-nn_params=Nn_params()
+#nn_params=Nn_params()
     
 def cr_matr(m, n):
     """
@@ -38,33 +43,33 @@ def cr_matr(m, n):
      return matr   
     
     
-def convert_to_fur(data:list)->list:
-    """
-    Нахождение амплитуд сигнала
-    data: сигнал
-    return список 
-    """
-    n=len(data)
-    dst=[None] * n
-    matr=np.zeros((n, n))   
-    i=0
-    for row in range(n):
-        k=0
-        arg=2 * math.pi * i * k / n   
-        for elem in range(n):   
-            matr[row][elem]=math.cos(arg)
-            k+=1
-        i+=1   
-    for row in range(n):
-        tmp_v=0
-        for elem in range(n):
-            tmp_v+=matr[row][elem] * data[elem]
-            tmp_v/=n
-        dst[row]=tmp_v
-    return dst 
+#def convert_to_fur(data:list)->list:
+    #"""
+    #Нахождение амплитуд сигнала
+    #data: сигнал
+    #return список 
+    #"""
+    #n=len(data)
+    #dst=[None] * n
+    #matr=np.zeros((n, n))   
+    #i=0
+    #for row in range(n):
+        #k=0
+        #arg=2 * math.pi * i * k / n   
+        #for elem in range(n):   
+            #matr[row][elem]=math.cos(arg)
+            #k+=1
+        #i+=1   
+    #for row in range(n):
+        #tmp_v=0
+        #for elem in range(n):
+            #tmp_v+=matr[row][elem] * data[elem]
+            #tmp_v/=n
+        #dst[row]=tmp_v
+    #return dst 
  
     
-matr1=cr_matr(m1, n1)
+#matr1=cr_matr(m1, n1)
   
     
 
@@ -103,7 +108,7 @@ def get_mse(out_nn,teacher,n):
         sum_+=math.pow((out_nn[row]-teacher[row]),2)
     return sum_ / n   
         
-def evaluate(X_test, Y_test):
+def evaluate_new(X_test, Y_test):
     """
     Оценка набора в процентах
     X_test: матрица обучающего набора X
@@ -239,5 +244,14 @@ def predict(matr,data,func):
     return dst_acted     
     
 # (X, Y, eps, l_r_,with_adap_lr,ac_,mse_)    
-feed_learn(X_and_or_xor,Y_and, 1000, 0.01,True,100,0.01) 
-print(f'predict: {predict(matr1,[0.6, 0.7], TAN)}')
+#feed_learn(X_and_or_xor,Y_and, 1000, 0.01,True,100,0.01) 
+#print(f'predict: {predict(matr1,[0.6, 0.7], TAN)}')
+nn_params=Nn_params()
+loger, date=get_logger("release", 'log.txt', __name__)
+i=cr_lay(nn_params, 'F', 2, 1, TAN, loger)
+nn_params.with_adap_lr=True
+nn_params.with_loss_threshold=True
+nn_params.input_neurons=2
+nn_params.outpu_neurons=1
+fit(nn_params, 1000, X_and_or_xor, Y_and, X_comp_and_or_xor, Y_and, loger)
+print(answer_nn_direct(nn_params, [0.6, 0.7], loger))

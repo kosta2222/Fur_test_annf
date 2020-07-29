@@ -23,7 +23,7 @@ class Lay:
 # Слой сети
 class Dense:
     def __init__(self):# конструктор
-        self.des='d'
+        self.des='F'
         self.in_ = None  # количество входов слоя
         self.out = None  # количество выходов слоя
         self.matrix = list([])  # матрица весов
