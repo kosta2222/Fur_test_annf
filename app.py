@@ -1,7 +1,7 @@
 ﻿import numpy as np
 import math
 from nn_constants import SIGMOID, SIGMOID_DERIV, TAN, TAN_DERIV, RELU, RELU_DERIV, LEAKY_RELU, LEAKY_RELU_DERIV
-from NN_params import NN_params
+from NN_params import Nn_params
 from operations import operations
 
 n1=2
@@ -17,15 +17,15 @@ Y_and_pr=[[0],  [0],  [0]]
 Y_or_pr=[[1],  [1],  [0]]
 Y_xor_pr=[[1],[1],[0]]
 
-X_comp=[[2/4, 2/4]]
-Y_comp=[[1/4]]
+X_comp_and_or_xor=[[2/4, 2/4]]
+Y_comp_and=[[1/4]]
 
 
-nn_params=NN_params()
+nn_params=Nn_params()
     
 def cr_matr(m, n):
     """
-    Создание матриц коэффициентов ряда Фурье для сеиевого мышления
+    Создание матриц коэффициентов ряда Фурье для сетевого мышления
     m: высота матрицы
     n: ширина матрицы
     """
@@ -49,9 +49,9 @@ def convert_to_fur(data:list)->list:
     matr=np.zeros((n, n))   
     i=0
     for row in range(n):
-        k=0      
-        for elem in range(n):
-            arg=- 2 * math.pi * i * k / n    
+        k=0
+        arg=2 * math.pi * i * k / n   
+        for elem in range(n):   
             matr[row][elem]=math.cos(arg)
             k+=1
         i+=1   
@@ -59,6 +59,7 @@ def convert_to_fur(data:list)->list:
         tmp_v=0
         for elem in range(n):
             tmp_v+=matr[row][elem] * data[elem]
+            tmp_v/=n
         dst[row]=tmp_v
     return dst 
  
@@ -117,7 +118,6 @@ def evaluate(X_test, Y_test):
     elem_of_out_nn = 0
     elem_answer = 0
     is_vecs_are_equal = False
-    delta_shure=0.4
     for row in range(rows):
         x_test = X_test[row]
         y_test = Y_test[row]
@@ -239,5 +239,5 @@ def predict(matr,data,func):
     return dst_acted     
     
 # (X, Y, eps, l_r_,with_adap_lr,ac_,mse_)    
-feed_learn(X_and_or_xor,Y_xor, 1000, 0.01,True,100,0.01) 
-print(f'predict: {predict(matr1,[1, 1], TAN)}')
+feed_learn(X_and_or_xor,Y_and, 1000, 0.01,True,100,0.01) 
+print(f'predict: {predict(matr1,[0.6, 0.7], TAN)}')
