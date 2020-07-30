@@ -7,7 +7,7 @@ from util import convert_to_fur
 from cross_val_eval import evaluate
 from util import get_logger
 from fit import fit
-from learn import cr_lay, answer_nn_direct, train, get_hidden
+from learn import cr_lay, answer_nn_direct, train, get_hidden, feed_forwarding, backpropagate, calc_out_error, upd_matrix, calc_hid_zero_lay
 
 n1=2
 m1=1
@@ -183,6 +183,8 @@ def feed_learn(nn_params:Nn_params, X, Y, eps, l_r_,with_adap_lr,ac_,mse_,loger,
     it=0
     exit_flag=False
     dst_acted=None
+    mse=0
+    out_nn=None
     
     loger.info(f'Log Started: {date}')
     
@@ -197,11 +199,11 @@ def feed_learn(nn_params:Nn_params, X, Y, eps, l_r_,with_adap_lr,ac_,mse_,loger,
         x=np.array(x)
         y=Y[retrive_ind]
         y=convert_to_fur(y)
-        loger.debug(f'may prost')
+        #loger.debug(f'may prost')
         loger.debug(f'brainy')     
-        out_nn,weighted=my_dot(matr1, x)
-        train(nn_params, x, y, loger)
-        out_nn=get_hidden(nn_params.net[nn_params.nl_count - 1])
+        #out_nn,weighted=my_dot(matr1, x)
+        #train(nn_params, x, y, loger)
+        out_nn=feed_forwarding(nn_params, True, x, loger)
         loger.debug(f'out_nn: {out_nn}')
         mse=get_mse(out_nn,y,nn_params.outpu_neurons)   
         print("mse",mse)
@@ -213,7 +215,7 @@ def feed_learn(nn_params:Nn_params, X, Y, eps, l_r_,with_adap_lr,ac_,mse_,loger,
         #loger.debug(f'delta: {delta}')
         #loger.debug(f'delta: {delta}')
         loger.debug('-----------')
-        error=get_mse(out_nn,y,m1)
+        error=get_mse(out_nn,y,nn_params.outpu_neurons)
         if with_adap_lr:     
             delta_error=error - gama * error_pr
             if delta_error>0:
@@ -221,17 +223,23 @@ def feed_learn(nn_params:Nn_params, X, Y, eps, l_r_,with_adap_lr,ac_,mse_,loger,
             else:
                 l_r=beta * l_r
             error_pr=error
-            nn_params.lr=l_r
-        #koef1=np.dot(delta_np, matr1)
+            #nn_params.lr=l_r
+        
+            
+        backpropagate(nn_params, out_nn, y, x, l_r, loger) 
+        #delta=calc_out_error(nn_params, nn_params.net[0], out_nn, y, loger)
+        #koef1=np.dot(delta, nn_params.net[0].matrix)
+        #koef1=calc_hid_zero_lay(nn_params.net[0], delta, loger)
         #print(f'koef1: {koef1}')
         #loger.debug(f'koef1: {koef1}')
-        #loger.debug(f'koef1: {koef1}')
-        #matr1-=koef1 * l_r * x
+        ##loger.debug(f'koef1: {koef1}')
+        ##matr1-=koef1 * l_r * x
+        #nn_params.net[0].matrix=upd_matrix(nn_params, nn_params.net[0], koef1, x, l_r, loger)
         print("lr",l_r)            
         ac=evaluate_new(X,Y, loger)
         print("acc", ac)  
         if nn_params.with_loss_threshold:
-          if ac==float(ac_) and mse<mse_+0.01 :
+          if ac==float(ac_) and mse<mse_:
              exit_flag=True
              break             
         
@@ -268,15 +276,14 @@ def predict(matr,data,func):
 nn_params=Nn_params()
 loger, date=get_logger("debug", 'log_.log', __name__,'a')
 i=cr_lay(nn_params, 'F', 2, 1, TAN)
-nn_params.with_adap_lr=False
-nn_params.with_loss_threshold=True
+nn_params.with_adap_lr=True
 nn_params.input_neurons=2
 nn_params.outpu_neurons=1
 nn_params.with_adap_lr=True
-nn_params.with_loss_threshold=False
+nn_params.with_loss_threshold =True
 #fit(nn_params, 1000, X_and_or_xor, Y_and, X_comp_and_or_xor, Y_and, loger)
 #(nn_params, X, Y, eps, l_r_,with_adap_lr,ac_,mse_,loger)
-feed_learn(nn_params, X_and_or_xor, Y_and, 14, 0.01, True, 100, 0.01, loger, date) 
+feed_learn(nn_params, X_and_or_xor, Y_and, 100, 0.01, True, 100, 0.01, loger, date) 
 #print(f'predict: {predict(matr1,[0.6, 0.7], TAN)}')
 #loger.debug(f'predict: {predict(matr1,[0.6, 0.7], TAN)}')
 loger.debug('brayny pred')
