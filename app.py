@@ -266,7 +266,7 @@ def predict(matr,data,func):
 #feed_learn(X_and_or_xor,Y_and, 1000, 0.01,True,100,0.01) 
 #print(f'predict: {predict(matr1,[0.6, 0.7], TAN)}')
 nn_params=Nn_params()
-loger, date=get_logger("debug", 'log.txt', __name__,'a')
+loger, date=get_logger("debug", 'log_.log', __name__,'a')
 i=cr_lay(nn_params, 'F', 2, 1, TAN)
 nn_params.with_adap_lr=False
 nn_params.with_loss_threshold=True

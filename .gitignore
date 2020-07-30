@@ -9,3 +9,5 @@ Makefile
 build/
 dist/
 nbproject/
+*.wpr
+*.log
