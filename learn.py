@@ -14,6 +14,7 @@ def calc_out_error(nn_params:Nn_params,objLay:Lay, targets:list, loger:logging.L
     if objLay.act_func!=SOFTMAX and nn_params.loss_func==MODIF_MSE:
       for row in range(objLay.out):
         nn_params.out_errors[row] = (objLay.hidden[row] - targets[row]) * operations(objLay.act_func + 1, objLay.cost_signals[row], 0.42, 0, 0, "", nn_params)
+      loger.debug(f'delta: {nn_params.out_errors}')    
     elif objLay.act_func==SOFTMAX and nn_params.loss_func==CROS_ENTROPY:
         for row in range(objLay.out):
             nn_params.out_errors[row] = (objLay.hidden[row] - targets[row])
@@ -31,6 +32,7 @@ def calc_hid_error(nn_params:Nn_params,prev_left_layer:Lay, current_layer_index:
     for elem in range(current_layer.in_):
          for row in range(current_layer.out):
               current_layer.errors[elem] +=current_layer.matrix[row][elem] * next_right_layer_deltas[row] *operations(prev_left_layer.act_func + 1, prev_left_layer.cost_signals[elem], 0, 0, 0, "", nn_params)
+    loger.debug(f'koef1: {current_layer.errors}')          
     # except Exception as e:
     #     print("Exc in calc hid err")
     #     print("obj lay", objLay)
@@ -61,10 +63,11 @@ def get_hidden(objLay:Lay):
     return objLay.hidden
 def get_essential_gradients(objLay:Lay):
     return objLay.errors
-def calc_hid_zero_lay(zeroLay:Lay,errors):
+def calc_hid_zero_lay(zeroLay:Lay,errors,loger):
     for elem in range(zeroLay.in_):
         for row in range(zeroLay.out):
             zeroLay.errors[elem]+=errors[row] * zeroLay.matrix[row][elem]
+    loger.debug(f'koef1: {zeroLay.errors}')            
 def upd_matrix(nn_params:Nn_params, objLay:Lay, entered_vals):
     assert ("here_use_dZ0rowdWrow","here_use_dZ0rowdWrow")
     for row in range(objLay.out):
@@ -129,7 +132,7 @@ def make_hidden(nn_params, objLay:Lay, inputs:list, loger:logging.Logger):
             copy_vector(ret_vec, objLay.hidden, objLay.out )
         loger.debug(f'cost s : {objLay.cost_signals[:10]}')
         loger.debug(f'hid s : {objLay.hidden[:10]}')
-        loger.debug('-----------')
+        loger.debug('****')
         
 def make_hidden_on_contrary(nn_params:Nn_params, objLay:Lay, inputs:list, loger:logging.Logger):
     tmp_v = 0
@@ -161,15 +164,16 @@ def backpropagate(nn_params:Nn_params, loger):
     calc_out_error(nn_params, nn_params.net[nn_params.nl_count - 1],nn_params.targets, loger)
     if nn_params.nl_count == 1:
         loger.debug('op')
-        calc_hid_zero_lay(nn_params.net[0], nn_params.out_errors)
+        calc_hid_zero_lay(nn_params.net[0], nn_params.out_errors, loger)
     else:    
       for i in range(nn_params.nl_count - 1, 0, -1):
         if i == nn_params.nl_count - 1:
            calc_hid_error(nn_params, nn_params.net[i-1], i, nn_params.out_errors, loger)
         else:
             calc_hid_error(nn_params, nn_params.net[i-1], i, nn_params.net[i+1].errors, loger)
-        calc_hid_zero_lay(nn_params.net[0], nn_params.net[1].errors)
+        calc_hid_zero_lay(nn_params.net[0], nn_params.net[1].errors, loger)
     if nn_params.nl_count == 1:
+        loger.debug('op upd_matr 1')
         upd_matrix(nn_params, nn_params.net[0], nn_params.inputs)
     else:    
       for i in range(nn_params.nl_count - 1, 0, -1):
@@ -199,8 +203,7 @@ def initiate_layers(nn_params:Nn_params,network_map:tuple,size):
         set_io(nn_params, nn_params.net[i], in_, out)
 
 def cr_lay(nn_params:Nn_params, type_='F', in_=0, out=0, act_func=None, loger=None):
-    loger.debug('-in cr_lay-') 
-    #i=-1
+    #loger.debug('-in cr_lay-') 
     if type_=='F':
         nn_params.sp_d+=1
         nn_params.net[nn_params.sp_d].in_=in_
@@ -212,5 +215,5 @@ def cr_lay(nn_params:Nn_params, type_='F', in_=0, out=0, act_func=None, loger=No
                  nn_params.net[nn_params.sp_d].matrix[row][elem] = i
                  i+=1
         nn_params.nl_count+=1
-        loger.debug(f'nn_params.sp_d {nn_params.sp_d} nn_params.net[nn_params.sp_d] {nn_params.net[nn_params.sp_d]}')
+        #loger.debug(f'nn_params.sp_d {nn_params.sp_d} nn_params.net[nn_params.sp_d] {nn_params.net[nn_params.sp_d]}')
         return nn_params
