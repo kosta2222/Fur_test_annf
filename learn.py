@@ -13,7 +13,7 @@ def calc_out_error(nn_params:Nn_params,objLay:Lay, out_nn, targets:list,loger:lo
     loger.debug('-in calc_out_error-')
     if objLay.act_func!=SOFTMAX and nn_params.loss_func==MODIF_MSE:
       for row in range(objLay.out):
-        nn_params.out_errors[row] = (out_nn[row] - targets[row]) * operations(TAN_DERIV, objLay.cost_signals[row], 0.42, 0, 0, "", nn_params)
+        nn_params.out_errors[row] = (out_nn[row] - targets[row]) * operations(objLay.act_func+1, objLay.cost_signals[row], 0.42, 0, 0, "", nn_params)
       loger.debug(f'delta: {nn_params.out_errors}')    
     elif objLay.act_func==SOFTMAX and nn_params.loss_func==CROS_ENTROPY:
         for row in range(objLay.out):
@@ -78,7 +78,9 @@ def upd_matrix(nn_params:Nn_params, objLay:Lay, koef, entered_vals , lr, loger):
     assert ("here_use_dZ0rowdWrow","here_use_dZ0rowdWrow")
     for row in range(objLay.out):
         for elem in range(objLay.in_):
-            objLay.matrix[row][elem] -= lr * koef[elem] * entered_vals[row]
+            tmp_v=objLay.matrix[row][elem]
+            tmp_v-= lr * koef[elem]  * entered_vals[elem]
+        objLay.matrix[row][elem]=tmp_v    
     return objLay.matrix        
 
 def feed_forwarding(nn_params:Nn_params,ok:bool, inputs, loger):

@@ -222,33 +222,19 @@ def feed_learn(nn_params:Nn_params, X, Y, eps, l_r_,with_adap_lr,ac_,mse_,loger,
                 l_r=alpha * l_r
             else:
                 l_r=beta * l_r
-            error_pr=error
-            #nn_params.lr=l_r
-        
-            
+            error_pr=error          
         backpropagate(nn_params, out_nn, y, x, l_r, loger) 
-        #delta=calc_out_error(nn_params, nn_params.net[0], out_nn, y, loger)
-        #koef1=np.dot(delta, nn_params.net[0].matrix)
-        #koef1=calc_hid_zero_lay(nn_params.net[0], delta, loger)
-        #print(f'koef1: {koef1}')
-        #loger.debug(f'koef1: {koef1}')
-        ##loger.debug(f'koef1: {koef1}')
-        ##matr1-=koef1 * l_r * x
-        #nn_params.net[0].matrix=upd_matrix(nn_params, nn_params.net[0], koef1, x, l_r, loger)
         print("lr",l_r)            
         ac=evaluate_new(X,Y, loger)
         print("acc", ac)  
         if nn_params.with_loss_threshold:
           if ac==float(ac_) and mse<mse_:
              exit_flag=True
-             break             
-        
-         
+             break                
       if exit_flag:
           break 
       if it==eps:
-          break
-      
+          break    
       it+=1
       
 
@@ -275,7 +261,8 @@ def predict(matr,data,func):
 #print(f'predict: {predict(matr1,[0.6, 0.7], TAN)}')
 nn_params=Nn_params()
 loger, date=get_logger("debug", 'log_.log', __name__,'a')
-i=cr_lay(nn_params, 'F', 2, 1, TAN)
+i=cr_lay(nn_params, 'F', 2, 3, RELU)
+i=cr_lay(nn_params, 'F', 3, 1, TAN)
 nn_params.with_adap_lr=True
 nn_params.input_neurons=2
 nn_params.outpu_neurons=1
@@ -287,6 +274,6 @@ feed_learn(nn_params, X_and_or_xor, Y_and, 100, 0.01, True, 100, 0.01, loger, da
 #print(f'predict: {predict(matr1,[0.6, 0.7], TAN)}')
 #loger.debug(f'predict: {predict(matr1,[0.6, 0.7], TAN)}')
 loger.debug('brayny pred')
-print(answer_nn_direct(nn_params, [0.6, 0.7], loger))
+print(answer_nn_direct(nn_params, [0.001, 0.07], loger))
 print("matr brayny",nn_params.net[0].matrix)
 #print("matr prost",matr1)
