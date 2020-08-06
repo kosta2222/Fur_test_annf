@@ -1,11 +1,14 @@
 import math
 from nn_constants import RELU, RELU_DERIV, INIT_W_HE, INIT_W_MY, SIGMOID, SIGMOID_DERIV, TAN, TAN_DERIV, INIT_W_GLOROT_MY,\
-INIT_W_HE_MY, SOFTMAX, CROS_ENTROPY, MODIF_MSE, INIT_W_MY_DEB
+INIT_W_HE_MY, SOFTMAX, CROS_ENTROPY, MODIF_MSE, INIT_W_MY_DEB,INIT_W_HE_MY
 from NN_params import Nn_params   # импортруем параметры сети
 from Lay import Lay, Dense   # импортируем слой
 from work_with_arr import copy_vector
 from operations import operations, softmax_ret_vec
 import logging
+import random
+from util import convert_to_fur
+import numpy as np
 
 
 def calc_out_error(nn_params:Nn_params,objLay:Lay, out_nn, targets:list,loger:logging.Logger):
@@ -18,7 +21,21 @@ def calc_out_error(nn_params:Nn_params,objLay:Lay, out_nn, targets:list,loger:lo
     elif objLay.act_func==SOFTMAX and nn_params.loss_func==CROS_ENTROPY:
         for row in range(objLay.out):
             nn_params.out_errors[row] = (out_nn[row] - targets[row])
-    return nn_params.out_errors         
+    return nn_params.out_errors 
+
+def get_mse(out_nn,teacher,n):
+    """
+    Получить среднеквадратичную ошибку сети
+    out_nn: вектор выхода сети
+    teacher: вектор ответов
+    n: количество элементов в любом векторе
+    return ошибку
+    """
+    sum_=0
+    for row in range(n):
+        sum_+=math.pow((out_nn[row]-teacher[row]),2)
+    return sum_ / n   
+
 def calc_hid_error(nn_params:Nn_params,prev_left_layer:Lay, current_layer_index:int, next_right_layer_deltas:list, loger:logging.Logger):
     """
     Calcs deltas for current layer
@@ -50,6 +67,7 @@ def get_min_square_err(out_nn:list,teacher_answ:list,n):
 def get_cros_entropy(ans, targ, n):
     E=0
     for row in range(n):
+        print("row", row)
         if targ[row]==1:
             E-=math.log(ans[row],math.e)
         else:
@@ -83,19 +101,16 @@ def upd_matrix(nn_params:Nn_params, objLay:Lay, koef, entered_vals , lr, loger):
         objLay.matrix[row][elem]=tmp_v    
     return objLay.matrix        
 
-def feed_forwarding(nn_params:Nn_params,ok:bool, inputs, loger):
+def feed_forwarding(nn_params:Nn_params, inputs, loger):
     if nn_params.nl_count==1:
        make_hidden(nn_params, nn_params.net[0], inputs, loger)
     else:
       make_hidden(nn_params, nn_params.net[0], inputs, loger)
       for i in range(1,nn_params.nl_count):
         make_hidden(nn_params, nn_params.net[i], get_hidden(nn_params.net[i - 1]), loger)
-    if ok:
-        for i in range(nn_params.outpu_neurons):
-            pass
-        return get_hidden(nn_params.net[nn_params.nl_count-1])
-    #else:
-         #backpropagate(nn_params, inputs, loger)
+    
+    return get_hidden(nn_params.net[nn_params.nl_count-1])
+    
 def feed_forwarding_on_contrary(nn_params:Nn_params, ok:bool, inputs, loger):
     make_hidden_on_contrary(nn_params, nn_params.net[nn_params.nl_count - 1 ], inputs, loger)
     for i in range(nn_params.nl_count - 2, -1, -1):
@@ -111,7 +126,7 @@ def train(nn_params:Nn_params,in_:list,targ:list, loger):
     feed_forwarding(nn_params,False, loger)
 def answer_nn_direct(nn_params:Nn_params,inputs:list, loger):
     out_nn = None
-    out_nn=feed_forwarding(nn_params,True, inputs, loger)
+    out_nn=feed_forwarding(nn_params, inputs, loger)
     return out_nn
 def answer_nn_direct_on_contrary(nn_params:Nn_params,in_:list, debug):
     out_nn = None
@@ -188,8 +203,7 @@ def backpropagate(nn_params:Nn_params, out_nn, targets, inputs, lr, loger):
           upd_matrix(nn_params, nn_params.net[i], nn_params.net[i].errors, get_hidden(nn_params.net[i - 1]), lr, loger)
       upd_matrix(nn_params, nn_params.net[0], nn_params.net[0].errors, inputs, lr, loger)
 
-
-
+np.random.seed(42)
 def cr_lay(nn_params:Nn_params, type_='F', in_=0, out=0, act_func=None, loger=None):
     #loger.debug('-in cr_lay-') 
     if type_=='F':
@@ -200,7 +214,8 @@ def cr_lay(nn_params:Nn_params, type_='F', in_=0, out=0, act_func=None, loger=No
         for row in range(out):
               i=1 
               for elem in range(in_):
-                 nn_params.net[nn_params.sp_d].matrix[row][elem] = i
+                 nn_params.net[nn_params.sp_d].matrix[row][elem] =np.random.randn() * (math.sqrt(2 / in_))
+                 #nn_params.net[nn_params.sp_d].matrix[row][elem]= i  
                  i+=1
         nn_params.nl_count+=1
         #loger.debug(f'nn_params.sp_d {nn_params.sp_d} nn_params.net[nn_params.sp_d] {nn_params.net[nn_params.sp_d]}')
