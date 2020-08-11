@@ -6,6 +6,7 @@ from Lay import Lay, Dense   # импортируем слой
 from work_with_arr import copy_vector
 from operations import operations, softmax_ret_vec
 import logging
+import numpy as np
 
 
 def calc_out_error(nn_params:Nn_params,objLay:Lay, out_nn, targets:list,loger:logging.Logger):
@@ -200,7 +201,7 @@ def cr_lay(nn_params:Nn_params, type_='F', in_=0, out=0, act_func=None, loger=No
         for row in range(out):
               i=1 
               for elem in range(in_):
-                 nn_params.net[nn_params.sp_d].matrix[row][elem] = i
+                 nn_params.net[nn_params.sp_d].matrix[row][elem] =np.random.randn()
                  i+=1
         nn_params.nl_count+=1
         #loger.debug(f'nn_params.sp_d {nn_params.sp_d} nn_params.net[nn_params.sp_d] {nn_params.net[nn_params.sp_d]}')

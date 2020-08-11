@@ -225,12 +225,12 @@ def feed_learn(nn_params:Nn_params, X, Y, eps, l_r_,with_adap_lr,ac_,mse_,loger,
             error_pr=error          
         backpropagate(nn_params, out_nn, y, x, l_r, loger) 
         print("lr",l_r)            
-        ac=evaluate_new(X,Y, loger)
-        print("acc", ac)  
-        if nn_params.with_loss_threshold:
-          if ac==float(ac_) and mse<mse_:
-             exit_flag=True
-             break                
+        #ac=evaluate_new(X,Y, loger)
+        #print("acc", ac)  
+        #if nn_params.with_loss_threshold:
+          #if ac==float(ac_) and mse<mse_:
+             #exit_flag=True
+             #break                
       if exit_flag:
           break 
       if it==eps:
@@ -261,8 +261,9 @@ def predict(matr,data,func):
 #print(f'predict: {predict(matr1,[0.6, 0.7], TAN)}')
 nn_params=Nn_params()
 loger, date=get_logger("debug", 'log_.log', __name__,'a')
-i=cr_lay(nn_params, 'F', 2, 3, RELU)
-i=cr_lay(nn_params, 'F', 3, 1, TAN)
+i=cr_lay(nn_params, 'F', 2, 7, SIGMOID)
+i=cr_lay(nn_params, 'F', 7, 7, SIGMOID)
+i=cr_lay(nn_params, 'F', 7, 1, TAN)
 nn_params.with_adap_lr=True
 nn_params.input_neurons=2
 nn_params.outpu_neurons=1
@@ -270,10 +271,13 @@ nn_params.with_adap_lr=True
 nn_params.with_loss_threshold =True
 #fit(nn_params, 1000, X_and_or_xor, Y_and, X_comp_and_or_xor, Y_and, loger)
 #(nn_params, X, Y, eps, l_r_,with_adap_lr,ac_,mse_,loger)
-feed_learn(nn_params, X_and_or_xor, Y_and, 100, 0.01, True, 100, 0.01, loger, date) 
+feed_learn(nn_params, X_and_or_xor, Y_or, 1000, 0.01, True, 100, 0.01, loger, date) 
 #print(f'predict: {predict(matr1,[0.6, 0.7], TAN)}')
 #loger.debug(f'predict: {predict(matr1,[0.6, 0.7], TAN)}')
 loger.debug('brayny pred')
 print(answer_nn_direct(nn_params, [0.001, 0.07], loger))
+
+for row in X_and_or_xor:
+   print(answer_nn_direct(nn_params, [row[0],row[1]], loger)) 
 print("matr brayny",nn_params.net[0].matrix)
 #print("matr prost",matr1)
