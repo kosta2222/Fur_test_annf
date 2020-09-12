@@ -182,7 +182,7 @@ def cr_lay(nn_params: Nn_params, type_='F', in_=0, out=0, act_func=None, loger=N
         for row in range(out):
             i=1
             for elem in range(in_):
-                layer.matrix[row][elem] = i
+                layer.matrix[row][elem] = i #operations(INIT_W_RANDOM, 0, nn_params)
                 i+=1
 
         nn_params.nl_count += 1

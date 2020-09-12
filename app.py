@@ -1,7 +1,6 @@
 ﻿from learn import cr_lay, answer_nn_direct, get_hidden, feed_forwarding, backpropagate, calc_out_error, upd_matrix,\
     get_err, calc_diff
 from util import get_logger
-from cross_val_eval import evaluate
 from util import convert_to_fur
 from operations import operations
 from NN_params import Nn_params
@@ -10,6 +9,7 @@ from nn_constants import SIGMOID, SIGMOID_DERIV, TAN, TAN_DERIV, RELU, RELU_DERI
 from nn_constants import SIGMOID, SIGMOID_DERIV, TAN, TAN_DERIV, RELU, RELU_DERIV, LEAKY_RELU, LEAKY_RELU_DERIV, TRESHOLD_FUNC
 import numpy as np
 import math
+import matplotlib.pyplot as plt
 
 
 X_and_or_xor = [[0, 1], [1, 0], [0, 0], [1, 1]]
@@ -26,7 +26,23 @@ X_comp_and_or_xor = [[2/4, 2/4]]
 Y_comp_and = [[1/4]]
 
 
-def evaluate_new(X_test, Y_test, loger):
+def plot_gr(_file: str, errors: list, epochs: list, name_gr: str, logger) -> None:
+    fig: plt.Figure = None
+    ax: plt.Axes = None
+    fig, ax = plt.subplots()
+    ax.plot(epochs, errors,
+            label="learning",
+            )
+    plt.xlabel('Эпоха обучения')
+    plt.ylabel('loss')
+    ax.legend()
+    plt.savefig(_file)
+    print("Graphic saved")
+    # logger.info("Graphic saved")
+    plt.show()
+
+
+def evaluate(X_test, Y_test, loger):
     """
     Оценка набора в процентах
     X_test: матрица обучающего набора X
@@ -94,6 +110,9 @@ def feed_learn(nn_params: Nn_params, X, Y, eps, l_r_, with_adap_lr, with_loss_th
     net_is_running = True
     it = 0
 
+    eps_l = []
+    errs_l = []
+
     while net_is_running:
         print("ep:", it)
         error = 0
@@ -115,7 +134,7 @@ def feed_learn(nn_params: Nn_params, X, Y, eps, l_r_, with_adap_lr, with_loss_th
             backpropagate(nn_params, out_nn, y, x, l_r, loger)
             print("lr", l_r)
         print('error', error)
-        ac = evaluate_new(X, Y, loger)
+        ac = evaluate(X, Y, loger)
         print("acc", ac)
         if with_loss_threshold:
             if error == mse_:
@@ -124,6 +143,12 @@ def feed_learn(nn_params: Nn_params, X, Y, eps, l_r_, with_adap_lr, with_loss_th
             if it == eps:
                 break
         it += 1
+
+        eps_l.append(it)
+        errs_l.append(error)
+
+    plot_gr('gr.png', errs_l, eps_l, 'test', None)
+        
 
 
 def predict(matr, data, func):
@@ -147,10 +172,10 @@ def predict(matr, data, func):
 
 nn_params = Nn_params()
 loger, date = get_logger("debug", 'log_.log', __name__)
-i = cr_lay(nn_params, 'F', 2, 3, TRESHOLD_FUNC)
-i = cr_lay(nn_params, 'F', 3, 1, TRESHOLD_FUNC)
-# i=cr_lay(nn_params, 'F', 7, 1, TAN)
+i = cr_lay(nn_params, 'F', 2, 8, TRESHOLD_FUNC)
+i = cr_lay(nn_params, 'F', 8, 1, TRESHOLD_FUNC)
+# i=cr_lay(nn_params, 'F', 7, 1, TRESHOLD_FUNC)
 nn_params.input_neurons = 2
 nn_params.outpu_neurons = 1
-feed_learn(nn_params, X_and_or_xor, Y_xor, 1000,
-           0.1, False, True, 0, loger)
+feed_learn(nn_params, X_and_or_xor, Y_xor, 300,
+           0.1, False, True, 1, loger)
