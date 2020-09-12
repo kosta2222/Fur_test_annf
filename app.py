@@ -92,7 +92,6 @@ def evaluate(X_test, Y_test, loger):
 
 def feed_learn(nn_params: Nn_params, X, Y, eps, l_r_, with_adap_lr, with_loss_threshold, mse_, loger):
     """
-    Обучение сети на 1-но слойном перпецетроне
     X: обучающий набор
     Y: ответы
     eps: количество эпох обучения
