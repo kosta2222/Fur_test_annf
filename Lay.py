@@ -27,6 +27,7 @@ class Dense:
         self.act_func = RELU
         self.hidden = [0] * max_rows_orOut_10  # вектор после функции активации
         self.errors = [0] * max_rows_orOut_10  # вектор ошибок слоя
+        self.with_bias = False
         for row in range(max_rows_orOut_10):  # создаем матрицу весов
             # подготовка матрицы весов,внутренняя матрица
             self.inner_m = list([0] * max_rows_orOut_10)

@@ -12,7 +12,7 @@ import numpy as np
 
 def make_hidden(nn_params, layer_ind, inputs: list, loger: logging.Logger):
     layer = nn_params.net[layer_ind]
-    if layer.des == 'd':
+    if layer.des == 'F':
         val = 0
         for row in range(layer.out):
             tmp_v = 0
@@ -171,7 +171,7 @@ def answer_nn_direct(nn_params: Nn_params, inputs, loger):
     return out_nn
 
 
-def cr_lay(nn_params: Nn_params, type_='F', in_=0, out=0, act_func=None, with_bias=True, loger=None):
+def cr_lay(nn_params: Nn_params, type_='F', in_=0, out=0, act_func=None, loger=None):
     if type_ == 'F':
         nn_params.sp_d += 1
         layer = nn_params.net[nn_params.sp_d]
@@ -179,15 +179,11 @@ def cr_lay(nn_params: Nn_params, type_='F', in_=0, out=0, act_func=None, with_bi
         layer.out = out
         layer.act_func = act_func
 
-        if with_bias:
-            in_ += 1
-            layer.with_bias = True
-
         for row in range(out):
-            i = 1
+            i=1
             for elem in range(in_):
                 layer.matrix[row][elem] = i
-                i += 1
+                i+=1
 
         nn_params.nl_count += 1
         return nn_params

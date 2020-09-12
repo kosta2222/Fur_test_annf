@@ -1,16 +1,16 @@
-﻿import numpy as np
-import math
-from nn_constants import SIGMOID, SIGMOID_DERIV, TAN, TAN_DERIV, RELU, RELU_DERIV, LEAKY_RELU, LEAKY_RELU_DERIV, TRESHOLD_FUNC
-from NN_params import Nn_params
-from operations import operations
-from util import convert_to_fur
-from cross_val_eval import evaluate
-from util import get_logger
-from learn import cr_lay, answer_nn_direct, get_hidden, feed_forwarding, backpropagate, calc_out_error, upd_matrix,\
+﻿from learn import cr_lay, answer_nn_direct, get_hidden, feed_forwarding, backpropagate, calc_out_error, upd_matrix,\
     get_err, calc_diff
+from util import get_logger
+from cross_val_eval import evaluate
+from util import convert_to_fur
+from operations import operations
+from NN_params import Nn_params
+from nn_constants import SIGMOID, SIGMOID_DERIV, TAN, TAN_DERIV, RELU, RELU_DERIV, LEAKY_RELU, LEAKY_RELU_DERIV, SOFTMAX,\
+    CROS_ENTROPY, MODIF_MSE
+from nn_constants import SIGMOID, SIGMOID_DERIV, TAN, TAN_DERIV, RELU, RELU_DERIV, LEAKY_RELU, LEAKY_RELU_DERIV, TRESHOLD_FUNC
+import numpy as np
+import math
 
-n1 = 2
-m1 = 1
 
 X_and_or_xor = [[0, 1], [1, 0], [0, 0], [1, 1]]
 Y_and = [[0], [0], [0], [1]]
@@ -24,45 +24,6 @@ Y_xor_pr = [[1], [1], [0]]
 
 X_comp_and_or_xor = [[2/4, 2/4]]
 Y_comp_and = [[1/4]]
-
-
-def cr_matr(m, n):
-    """
-    Создание матриц коэффициентов ряда Фурье для сетевого мышления
-    m: высота матрицы
-    n: ширина матрицы
-    """
-    matr = np.zeros((m, n))
-    for row in range(m):
-        i = 1
-        for elem in range(n):
-            matr[row][elem] = i
-            i += 1
-        return matr
-
-
-matr1 = cr_matr(m1, n1)
-
-
-def my_dot(matr: list, data: list) -> list:
-    """
-    Получение суммы ряда Фурье на нейронах и активация
-    matr: матрица сети
-    data: кейс X обучающего набора i.e. амплидуды гармоник
-    return активированные нейроны
-    """
-    dst = [None] * len(matr)
-    dst_acted = [None] * len(matr)
-    for row in range(len(matr)):
-        tmp_v = 0
-        n = 1
-        for elem in range(len(matr[0])):
-            tmp_v += math.cos(2 * np.pi * n * matr[row][elem]) * data[elem]
-            n += 1
-        dst[row] = tmp_v
-        dst_acted[row] = operations(TAN, tmp_v, nn_params)
-
-    return dst_acted, dst
 
 
 def evaluate_new(X_test, Y_test, loger):
@@ -124,19 +85,14 @@ def feed_learn(nn_params: Nn_params, X, Y, eps, l_r_, with_adap_lr, with_loss_th
     ac_: уверенность сети для выхода
     mse_: пороговый минимальная среднеквадратичная ошибка выхода
     """
-    global matr1
     alpha = 0.99
     beta = 1.01
     gama = 1.01
-    error = 0
     error_pr = 0
     delta_error = 0
     l_r = l_r_
     net_is_running = True
     it = 0
-    exit_flag = False
-    mse = 0
-    out_nn = None
 
     while net_is_running:
         print("ep:", it)
@@ -193,8 +149,8 @@ nn_params = Nn_params()
 loger, date = get_logger("debug", 'log_.log', __name__)
 i = cr_lay(nn_params, 'F', 2, 3, TRESHOLD_FUNC)
 i = cr_lay(nn_params, 'F', 3, 1, TRESHOLD_FUNC)
-#i=cr_lay(nn_params, 'F', 7, 1, TAN)
+# i=cr_lay(nn_params, 'F', 7, 1, TAN)
 nn_params.input_neurons = 2
 nn_params.outpu_neurons = 1
-feed_learn(nn_params, X_and_or_xor, Y_or, 1000,
+feed_learn(nn_params, X_and_or_xor, Y_xor, 1000,
            0.1, False, True, 0, loger)
